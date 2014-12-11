@@ -1,0 +1,32 @@
+{
+  "name": "ds18b20",
+  "version": "0.0.0",
+  "description": "Provides an interface for the Dallas DS18B20 onewire temperature sensor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ianmetcalf/node-ds18b20.git"
+  },
+  "keywords": [
+    "i2c",
+    "ds2482",
+    "ds18b20",
+    "onewire",
+    "temperature",
+    "sensor",
+    "raspberry",
+    "pi"
+  ],
+  "author": "Ian Metcalf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ianmetcalf/node-ds18b20/issues"
+  },
+  "homepage": "https://github.com/ianmetcalf/node-ds18b20",
+  "dependencies": {
+    "ds2482": "^0.2.0"
+  }
+}
