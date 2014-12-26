@@ -42,6 +42,45 @@ DS18B20.search = function(callback) {
   });
 };
 
+DS18B20.read = function(callback) {
+  if (!devices.length) { return callback(null, []); }
+
+  DS18B20.startConversion(function(err) {
+    if (err) { return callback(err); }
+
+    function next(memo, device) {
+      device.readScratchpad(function(err, resp) {
+        if (err) { return callback(err); }
+
+        memo.push(resp.temperature);
+
+        if (memo.length < devices.length) {
+          next(memo, devices[memo.length]);
+
+        } else {
+          callback(null, memo);
+        }
+      });
+    }
+
+    next([], devices[0]);
+  });
+};
+
+DS18B20.Device.prototype.read = function(callback) {
+  var that = this;
+
+  DS18B20.startConversion(this.rom, function(err) {
+    if (err) { return callback(err); }
+
+    that.readScratchpad(function(err, resp) {
+      if (err) { return callback(err); }
+
+      callback(null, resp.temperature);
+    });
+  });
+};
+
 DS18B20.startConversion = function(rom, callback) {
   wire.sendCommand(cmds.CONVERT_TEMP, rom, callback);
 };
