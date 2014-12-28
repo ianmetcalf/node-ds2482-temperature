@@ -1,27 +1,22 @@
 var DS2482 = require('ds2482'),
   cmds = require('./commands');
 
-var DS18B20 = {},
-  devices = [],
-  wire;
+
+
+var DS18B20 = function(options) {
+  options = options || {};
+
+  this.sensors = [];
+  this.wire = options.wire || new DS2482(options);
+};
 
 DS18B20.FAMILY = 0x28;
 
-DS18B20.Device = function(rom) {
-  this.rom = rom;
-};
-
-DS18B20.init = function(options, callback) {
+var Sensor = DS18B20.Sensor = function(rom, options) {
   options = options || {};
 
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-
-  wire = options.wire || new DS2482(options);
-
-  wire.init(callback);
+  this.rom = rom;
+  this.wire = options.wire || new DS2482(options);
 };
 
 
@@ -30,32 +25,42 @@ DS18B20.init = function(options, callback) {
  * Main API
  */
 
-DS18B20.search = function(callback) {
-  wire.searchByFamily(DS18B20.FAMILY, function(err, resp) {
+DS18B20.prototype.init = function(callback) {
+  this.wire.init(callback);
+};
+
+DS18B20.prototype.search = function(callback) {
+  var that = this;
+
+  this.wire.searchByFamily(DS18B20.FAMILY, function(err, resp) {
     if (err) { return callback(err); }
 
-    devices = resp.map(function(rom) {
-      return new DS18B20.Device(rom);
+    that.sensors = resp.map(function(rom) {
+      return new Sensor(rom, {wire: that.wire});
     });
 
-    callback(null, devices);
+    callback(null, that.sensors);
   });
 };
 
-DS18B20.read = function(callback) {
-  if (!devices.length) { return callback(null, []); }
+DS18B20.prototype.read = function(callback) {
+  var that = this;
 
-  DS18B20.startConversion(function(err) {
+  if (!this.sensors.length) {
+    return callback(null, []);
+  }
+
+  this.startConversion(function(err) {
     if (err) { return callback(err); }
 
-    function next(memo, device) {
-      device.readScratchpad(function(err, resp) {
+    function next(memo, sensor) {
+      sensor.readScratchpad(function(err, resp) {
         if (err) { return callback(err); }
 
         memo.push(resp.temperature);
 
-        if (memo.length < devices.length) {
-          next(memo, devices[memo.length]);
+        if (memo.length < that.sensors.length) {
+          next(memo, that.sensors[memo.length]);
 
         } else {
           callback(null, memo);
@@ -63,14 +68,39 @@ DS18B20.read = function(callback) {
       });
     }
 
-    next([], devices[0]);
+    next([], that.sensors[0]);
   });
 };
 
-DS18B20.Device.prototype.read = function(callback) {
+DS18B20.prototype.startConversion = function(rom, callback) {
+  this.wire.sendCommand(cmds.CONVERT_TEMP, rom, callback);
+};
+
+DS18B20.prototype.getPowerMode = function(rom, callback) {
   var that = this;
 
-  DS18B20.startConversion(this.rom, function(err) {
+  if (typeof rom === 'function') {
+    callback = rom;
+    rom = null;
+  }
+
+  this.wire.sendCommand(cmds.READ_POWER_SUPPLY, rom, function(err) {
+    if (err) { return callback(err); }
+
+    that.wire.bit(callback);
+  });
+};
+
+
+
+/*
+ * Sensor API
+ */
+
+Sensor.prototype.read = function(callback) {
+  var that = this;
+
+  this.startConversion(function(err) {
     if (err) { return callback(err); }
 
     that.readScratchpad(function(err, resp) {
@@ -81,29 +111,12 @@ DS18B20.Device.prototype.read = function(callback) {
   });
 };
 
-DS18B20.startConversion = function(rom, callback) {
-  wire.sendCommand(cmds.CONVERT_TEMP, rom, callback);
+Sensor.prototype.startConversion = function(callback) {
+  DS18B20.prototype.startConversion.call(this, this.rom, callback);
 };
 
-DS18B20.Device.prototype.startConversion = function(callback) {
-  DS18B20.startConversion(this.rom, callback);
-};
-
-DS18B20.getPowerMode = function(rom, callback) {
-  if (typeof rom === 'function') {
-    callback = rom;
-    rom = null;
-  }
-
-  wire.sendCommand(cmds.READ_POWER_SUPPLY, rom, function(err) {
-    if (err) { return callback(err); }
-
-    wire.bit(callback);
-  });
-};
-
-DS18B20.Device.prototype.getPowerMode = function(callback) {
-  DS18B20.getPowerMode(this.rom, callback);
+Sensor.prototype.getPowerMode = function(callback) {
+  DS18B20.prototype.getPowerMode.call(this, this.rom, callback);
 };
 
 
@@ -114,11 +127,13 @@ DS18B20.Device.prototype.getPowerMode = function(callback) {
 
 DS18B20.SCRATCHPAD_SIZE = 9;
 
-DS18B20.Device.prototype.writeScratchpad = function(scratchpad, callback) {
-  wire.sendCommand(cmds.WRITE_SCRATCHPAD, this.rom, function(err) {
+Sensor.prototype.writeScratchpad = function(scratchpad, callback) {
+  var that = this;
+
+  this.wire.sendCommand(cmds.WRITE_SCRATCHPAD, this.rom, function(err) {
     if (err) { return callback(err); }
 
-    wire.writeData( new Buffer([
+    that.wire.writeData( new Buffer([
       scratchpad.alarmHigh,
       scratchpad.alarmLow,
       scratchpad.config
@@ -126,11 +141,13 @@ DS18B20.Device.prototype.writeScratchpad = function(scratchpad, callback) {
   });
 };
 
-DS18B20.Device.prototype.readScratchpad = function(callback) {
-  wire.sendCommand(cmds.READ_SCRATCHPAD, this.rom, function(err) {
+Sensor.prototype.readScratchpad = function(callback) {
+  var that = this;
+
+  this.wire.sendCommand(cmds.READ_SCRATCHPAD, this.rom, function(err) {
     if (err) { return callback(err); }
 
-    wire.readData(DS18B20.SCRATCHPAD_SIZE, function(err, buffer) {
+    that.wire.readData(DS18B20.SCRATCHPAD_SIZE, function(err, buffer) {
       if (err) { return callback(err); }
 
       if (!DS2482.checkCRC(buffer)) {
