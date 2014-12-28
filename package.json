@@ -1,14 +1,14 @@
 {
-  "name": "ds18b20",
+  "name": "ds2482-temperature",
   "version": "0.0.0",
-  "description": "Provides an interface for the Dallas DS18B20 onewire temperature sensor",
+  "description": "Provides an interface for the Dallas DS18B20 temperature sensor over the DS2482 onewire bridge",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ianmetcalf/node-ds18b20.git"
+    "url": "https://github.com/ianmetcalf/node-ds2482-temperature.git"
   },
   "keywords": [
     "i2c",
@@ -23,9 +23,9 @@
   "author": "Ian Metcalf",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ianmetcalf/node-ds18b20/issues"
+    "url": "https://github.com/ianmetcalf/node-ds2482-temperature/issues"
   },
-  "homepage": "https://github.com/ianmetcalf/node-ds18b20",
+  "homepage": "https://github.com/ianmetcalf/node-ds2482-temperature",
   "dependencies": {
     "ds2482": "^0.2.0"
   }
