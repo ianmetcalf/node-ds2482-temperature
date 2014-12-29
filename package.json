@@ -1,6 +1,6 @@
 {
   "name": "ds2482-temperature",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Provides an interface for the Dallas DS18B20 temperature sensor over the DS2482 onewire bridge",
   "main": "index.js",
   "scripts": {
