@@ -12,7 +12,7 @@
  *   the strong pullup during the conversion.
  */
 
-exports.CONVERT_TEMP = 0X44;
+exports.CONVERT_TEMP = 0x44;
 
 
 
