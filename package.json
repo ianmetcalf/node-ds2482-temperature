@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/ianmetcalf/node-ds2482-temperature",
   "dependencies": {
-    "ds2482": "^0.2.0"
+    "ds2482": "^0.3.0"
   },
   "devDependencies": {
     "eslint": "^3.15.0",
