@@ -70,10 +70,14 @@ Initiates a measurement and returns the temperature readings from all known sens
 
 _NOTE:_ Will only read sensors that were found by most recent search
 
-__Returns:__ `Promise <Number[]>` resolves with list of temperatures
+__Returns:__ `Promise {rom:String, value:Number}` resolves with list of temperatures
 
 ```js
-[ 22.9375, 22.875, 21.9375 ]
+[
+  {rom: "2826274402000012", value: 22.9375},
+  {rom: "28493331020000bf", value: 22.875},
+  {rom: "280b135f020000d9", value: 21.9375},
+]
 ```
 
 ---
