@@ -40,6 +40,7 @@ __Options:__
 - `i2c` an instance of [i2c](https://github.com/kelly/node-i2c)
 - `address` the i2c address of the bridge chip, default: `0x18`
 - `device` the location of the i2c interface, default: `/dev/i2c-1`
+- `units` the temperature units, default: `C`
 
 ---
 
@@ -66,15 +67,15 @@ __Returns:__ `Promise <Array <Sensor>>` resolves with list of sensors
 ---
 
 ### sense.readTemperatures()
-Initiates a measurement and returns the temperature readings from all known sensors in celsius
+Initiates a measurement and returns the temperature readings from all known sensors
 
-__Returns:__ `Promise <Array {rom:String, value:Number}>` resolves with list of temperatures
+__Returns:__ `Promise <Array {rom:String, value:Number, units:Sting}>` resolves with list of temperatures
 
 ```js
 [
-  {rom: "2826274402000012", value: 22.9375},
-  {rom: "28493331020000bf", value: 22.875},
-  {rom: "280b135f020000d9", value: 21.9375},
+  {rom: "2826274402000012", value: 22.9375, units: "C"},
+  {rom: "28493331020000bf", value: 22.875, units: "C"},
+  {rom: "280b135f020000d9", value: 21.9375, units: "C"},
 ]
 ```
 
@@ -91,11 +92,12 @@ __Options:__
 - `i2c` an instance of [i2c](https://github.com/kelly/node-i2c)
 - `address` the i2c address of the bridge chip, default: `0x18`
 - `device` the location of the i2c interface, default: `/dev/i2c-1`
+- `units` the temperature units, default: `C`
 
 ---
 
 ### sensor.readTemperature()
-Initiates a measurement and returns the temperature reading from a particular sensor in celsius
+Initiates a measurement and returns the temperature reading from a particular sensor
 
 __Returns:__ `Promise <Number>` resolves with temperature
 
