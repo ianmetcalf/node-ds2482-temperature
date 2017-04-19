@@ -53,7 +53,7 @@ __Returns:__ `Promise <Uint8>` resolves with DS2482 status register
 ### sense.search()
 Searches the bus and returns a list of found temperature sensors
 
-__Returns:__ `Promise <Sensor[]>` resolves with list of sensors
+__Returns:__ `Promise <Array <Sensor>>` resolves with list of sensors
 
 ```js
 [
@@ -68,9 +68,7 @@ __Returns:__ `Promise <Sensor[]>` resolves with list of sensors
 ### sense.readTemperatures()
 Initiates a measurement and returns the temperature readings from all known sensors in celsius
 
-_NOTE:_ Will only read sensors that were found by most recent search
-
-__Returns:__ `Promise {rom:String, value:Number}` resolves with list of temperatures
+__Returns:__ `Promise <Array {rom:String, value:Number}>` resolves with list of temperatures
 
 ```js
 [
