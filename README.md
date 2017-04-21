@@ -30,10 +30,33 @@ sense.init()
 });
 ```
 
+## Streaming
+
+```js
+const DS18B20 = require('ds2482-temperature');
+
+const sense = new DS18B20();
+
+sense.init()
+
+.then(() => {
+  sense.on('data', val => {
+    console.log(val);
+  });
+
+  sense.on('error', err => {
+    console.error(err);
+  });
+});
+```
+
 # API
 
 ### new DS18B20([options])
-Creates an interface for Dallas DS18B20 temperature sensors
+
+Creates an interface for Dallas DS18B20 temperature sensors. The instance inherites from
+[readable stream](https://nodejs.org/api/stream.html#stream_readable_streams)
+and will search and emit measurements for all found sensors when a `data` listener is added.
 
 __Options:__
 - `wire` an instance of [wire](https://github.com/ianmetcalf/node-ds2482)
@@ -41,6 +64,7 @@ __Options:__
 - `address` the i2c address of the bridge chip, default: `0x18`
 - `device` the location of the i2c interface, default: `/dev/i2c-1`
 - `units` the temperature units, default: `C`
+- `pollRate` the rate to poll the sensors when streaming, default: `30 secs`
 
 ---
 
@@ -81,8 +105,16 @@ __Returns:__ `Promise <Array {rom:String, value:Number, units:Sting}>` resolves 
 
 ---
 
+### sense.destroy()
+Destroys the streaming interface
+
+---
+
 ### new DS18B20.Sensor(rom [, options])
-Creates a temperature sensor instance
+
+Creates a temperature sensor instance. The instance inherites from
+[readable stream](https://nodejs.org/api/stream.html#stream_readable_streams)
+and will emit measurements from the sensor when a `data` listener is added.
 
 __Arguments:__
 - `rom` the ROM address of the sensor as a 16 character hex encoded string
@@ -93,6 +125,7 @@ __Options:__
 - `address` the i2c address of the bridge chip, default: `0x18`
 - `device` the location of the i2c interface, default: `/dev/i2c-1`
 - `units` the temperature units, default: `C`
+- `pollRate` the rate to poll the sensor when streaming, default: `30 secs`
 
 ---
 
@@ -104,3 +137,8 @@ __Returns:__ `Promise <Number>` resolves with temperature
 ```js
 22.9375
 ```
+
+---
+
+### sensor.destroy()
+Destroys the streaming interface
